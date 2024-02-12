@@ -113,7 +113,7 @@ form {
     min-width: 300px;
 }
 
-section input {
+section input, button {
     height: 50px;
 	font-size: 1.2em;
 	border: none;
@@ -125,15 +125,20 @@ section input {
     margin-bottom: 35px;
 }
 
-input[type="submit"]{
+button {
 	font-family: 'Syne';
 	font-weight: 700;
 	color: white;
 	background-color: #1D6154;
 	margin : 2em auto ;
+	margin-bottom: 1em !important;
 	width: 180px;
 	text-align: center;
 	border-radius: 60px ;
+}
+
+#errorMessage {
+	margin-bottom: 1em;
 }
 
 footer nav ul {
@@ -142,3 +147,6 @@ footer nav ul {
 	margin: 2em
 }
 
+#login {
+	font-weight: bold;
+}

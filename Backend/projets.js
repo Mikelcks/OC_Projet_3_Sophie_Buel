@@ -1,4 +1,4 @@
-const API_PREFIX = "http://localhost:5678/api/"
+import { API_PREFIX } from './consts.js';
 
 async function chargerProjets() {
     const reponse = await fetch(API_PREFIX + "works");
@@ -13,7 +13,7 @@ async function chargerProjets() {
         const boutonTrierTous = document.getElementById("btnTous");
         boutonTrierTous.addEventListener("click", function () {
             const tous = projets.filter(function (projet) {
-            return projet.category.id;
+                return projet.category.id;
             });
             document.querySelector(".gallery").innerHTML = "";
             genererProjet(tous)

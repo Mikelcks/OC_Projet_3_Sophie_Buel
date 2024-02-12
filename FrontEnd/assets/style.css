@@ -127,9 +127,36 @@ header a {
 #introduction p {
 	margin-bottom: 0.5em;
 }
+
+#portfolio {
+    text-align: center;
+}
+
+#portfolio-header {
+    text-align: center;
+	justify-content: center;
+	
+}
+
+#btnModifier {
+    background-color: white;
+    border: none;
+}
+
 #portfolio h2 {
-	text-align: center;
-	margin-bottom: 1em;
+    display: inline-block;
+    margin-bottom: 1em;
+}
+
+#portfolio h2::after { 
+    display: inline-block;
+}
+
+#btnModifier {
+    margin-left: 10px; 
+    background-color: white;
+    border: none;
+	display: none;
 }
 
 #filters {
