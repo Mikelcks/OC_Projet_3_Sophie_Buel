@@ -131,6 +131,33 @@ header a {
 	text-align: center;
 	margin-bottom: 1em;
 }
+
+#filters {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	margin-bottom: 50px;
+}
+
+.filter_button {
+	height: 37px;
+    min-width: 100px;
+    padding: 4px 10px 4px 10px;
+    border-radius: 60px;
+    border: 1px solid #1D6154;
+	color: #1D6154;
+    background-color: white;
+    gap: 10px;
+    font-size: 16px;
+	font-weight: 700;
+}
+
+.filter_button:active {
+	background-color: #1D6154;
+	color: white;
+}
+
 .gallery {
 	width: 100%;
 	display: grid;
