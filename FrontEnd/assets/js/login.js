@@ -1,10 +1,12 @@
-function performLogin() {
+import { API_PREFIX } from './consts.js';
+
+const performLogin = () => {
     // Récupérer les valeurs du formulaire
     var email = document.getElementById("email").value;
     var password = document.getElementById("password").value;
 
     // Effectuer une requête vers l'API
-    fetch("http://localhost:5678/api/users/login", {
+    fetch( API_PREFIX + "users/login", {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -17,11 +19,6 @@ function performLogin() {
         if (data.userId && data.token) {
             // Connexion réussie
             localStorage.setItem('token', data.token);
-            var btnModififer = document.getElementById("btnModifier");
-            console.log(btnModififer);
-            if (btnModififer) {
-                btnModififer.style.display = "block";
-            }
             window.location.href = "index.html";
         } else {
             // Afficher un message d'erreur
@@ -33,3 +30,5 @@ function performLogin() {
         console.error('Erreur lors de la requête:', error);
     });
 }
+
+window.performLogin = performLogin;

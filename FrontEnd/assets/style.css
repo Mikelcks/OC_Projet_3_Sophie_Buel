@@ -132,13 +132,12 @@ header a {
     text-align: center;
 }
 
-#portfolio-header {
+#portfolio-title {
     text-align: center;
-	justify-content: center;
-	
+	justify-content: center;	
 }
 
-#btnModifier {
+#btnModify {
     background-color: white;
     border: none;
 }
@@ -152,11 +151,10 @@ header a {
     display: inline-block;
 }
 
-#btnModifier {
+#btnModify {
     margin-left: 10px; 
     background-color: white;
     border: none;
-	display: none;
 }
 
 #filters {
