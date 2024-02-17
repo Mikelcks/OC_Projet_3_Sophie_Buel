@@ -149,7 +149,7 @@ header a {
 	flex-grow: 1;
 }
 
-#divBtnModify {
+#spanBtnModify {
 	display: flex;
 	position: absolute;
 	align-items: center;
@@ -163,6 +163,17 @@ header a {
 	right: 32%;
 	display: flex;
 	align-items: center;
+}
+
+#headerEdition {
+	height: 50px;
+	background-color: black;
+	width: 100%;
+	color: white;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 10px;
 }
 
 

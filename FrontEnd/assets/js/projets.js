@@ -12,7 +12,7 @@ async function chargerProjets() {
 }
 
 function creerBtnModify() {
-    var parentElement = document.getElementById('divBtnModify');
+    var parentElement = document.getElementById('spanBtnModify');
   
     var bouton = document.createElement('button');
   
@@ -26,9 +26,27 @@ function creerBtnModify() {
   
     var texteSpan = document.createElement('span');
     texteSpan.innerHTML = ' modifier';
-
     bouton.appendChild(texteSpan);
+
     parentElement.appendChild(bouton);
+}
+
+function creerHeaderEdition () {
+    var headerEditionDiv = document.createElement('div');
+
+    headerEditionDiv .id = 'headerEdition';
+
+    var icone = document.createElement('i')
+    icone.className = 'fa-regular fa-pen-to-square'; 
+    headerEditionDiv.appendChild(icone);
+
+    var texteSpan = document.createElement('span');
+    texteSpan.innerHTML = ' Mode édition';
+    headerEditionDiv.appendChild(texteSpan);
+
+    var body = document.getElementById('body')
+
+    body.insertBefore(headerEditionDiv, body.firstChild);
 }
 
 async function initialiserPage() {
@@ -37,6 +55,7 @@ genererProjet(projets);
 
     if (isLoggedIn()) {
         creerBtnModify();
+        creerHeaderEdition();
         document.getElementById("loginList").innerText = "";
         document.getElementById("loginList").innerText = "logout";
         logOut();
