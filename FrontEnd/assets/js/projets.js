@@ -115,6 +115,16 @@ function openModal() {
 function addNewProject() {
     modal.innerHTML = ""
 
+    var previousBtn = document.createElement("button");
+    previousBtn.id = "previousBtn";
+    var iconePreviousModal = document.createElement('i')
+    iconePreviousModal.className = 'fa-solid fa-arrow-left'
+    previousBtn.appendChild(iconePreviousModal)
+    previousBtn.addEventListener("click", () => {
+        openModal();
+    });  
+    modal.appendChild(previousBtn);  
+
     const tileAddPhoto = document.createElement("h3");
     tileAddPhoto.textContent = "Ajout Photo";
     modal.appendChild(tileAddPhoto);
@@ -123,22 +133,98 @@ function addNewProject() {
     addPhotoContainer.id = "add-photo-container";
     modal.appendChild(addPhotoContainer)
 
-    const addPhotoLabel = document.createElement("label");
-    addPhotoLabel.id = "add-photo-label";
-    addPhotoContainer.appendChild(addPhotoLabel)
+    const addPhotoDiv = document.createElement("div");
+    addPhotoDiv.id = "add-photo-div";
+    addPhotoContainer.appendChild(addPhotoDiv)
 
     const iconeAddPhoto = document.createElement('i');
     iconeAddPhoto.className = 'fa-regular fa-image';
-    addPhotoLabel.appendChild(iconeAddPhoto);
+    addPhotoDiv.appendChild(iconeAddPhoto);
 
-    const btnAddPhoto = document.createElement("button");
-    btnAddPhoto.id = "button-add-photo";
-    btnAddPhoto.innerHTML = "+ Ajouter photo";
-    addPhotoLabel.appendChild(btnAddPhoto);
+
+
+    const btnAddProject = document.createElement("input");
+    btnAddProject.type = "file";
+    btnAddProject.id = "input-add-photo";
+    btnAddProject.accept = "image/*";
+    addPhotoDiv.appendChild(btnAddProject);
+
+    const labelAddPhoto = document.createElement("label");
+    labelAddPhoto.htmlFor = "input-add-photo";
+    labelAddPhoto.innerHTML = "+ Ajouter photo";
+    addPhotoDiv.appendChild(labelAddPhoto);
+
+    btnAddProject.addEventListener("change", (event) => {
+        handleFileSelect(event);
+    });
+
 
     const photoFormat = document.createElement("p");
     photoFormat.textContent = "jpg, png : 4mo max";    
-    addPhotoLabel.appendChild(photoFormat)
+    addPhotoDiv.appendChild(photoFormat)
+
+    const infoPhotoContainer = document.createElement("container");
+    infoPhotoContainer.id = "info-photo-container";
+    addPhotoContainer.appendChild(infoPhotoContainer)
+
+    const titleAddPhoto = document.createElement("h4");
+    titleAddPhoto.innerHTML = "Titre";
+    const inputTitleAddPhoto = document.createElement("input");
+    inputTitleAddPhoto.className = "input-new-project";
+    const categoryAddPhoto = document.createElement("h4");
+    categoryAddPhoto.innerHTML = "Catégorie";
+    const selectCategoryAddPhoto = document.createElement("select");
+    selectCategoryAddPhoto.className = "input-new-project";
+
+    infoPhotoContainer.appendChild(titleAddPhoto);
+    infoPhotoContainer.appendChild(inputTitleAddPhoto);
+    infoPhotoContainer.appendChild(categoryAddPhoto);
+    infoPhotoContainer.appendChild(selectCategoryAddPhoto);
+    
+    fetch('http://localhost:5678/api/categories')
+    .then(response => response.json())
+    .then(data => {
+        selectCategoryAddPhoto.innerHTML = "";
+        
+        data.forEach(category => {
+            const optionElement = document.createElement("option");
+            optionElement.value = category.id;
+            optionElement.text = category.name;
+            selectCategoryAddPhoto.appendChild(optionElement);
+            });
+
+        })
+        .catch(error => console.error('Erreur lors de la récupération des catégories depuis l\'API:', error));
+
+    const separatorLine = document.createElement("div");
+    separatorLine.id = "separator-line";
+    addPhotoContainer.appendChild(separatorLine);
+
+    const btnSubmitProject = document.createElement("button");
+    btnSubmitProject.id = "button-submit-project";
+    btnSubmitProject.innerHTML = "Valider"
+
+    inputTitleAddPhoto.addEventListener("input", function () {
+        validateForm();
+    });
+
+    selectCategoryAddPhoto.addEventListener("change", function () {
+        validateForm();
+    });
+
+    function validateForm() {
+        const isTitleFilled = inputTitleAddPhoto.value.trim() !== "";
+        const isCategorySelected = selectCategoryAddPhoto.value !== "";
+
+        btnSubmitProject.disabled = !(isTitleFilled && isCategorySelected);
+    }
+
+    addPhotoContainer.appendChild(btnSubmitProject);
+
+    btnSubmitProject.addEventListener("click", () => {
+        addNewProject();
+    });
+
 }
 
 function creerMiniature(projet) {
