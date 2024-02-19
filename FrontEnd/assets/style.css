@@ -282,8 +282,14 @@ footer nav ul {
 	position: fixed;
 	top: 50%;
 	left: 50%;
+	width: 630px;
 	transform: translate(-50%, -50%);
 	background-color: white;
 	padding: 20px;
 	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+#closeBtn {
+	background-color: white;
+	border: none;
 }

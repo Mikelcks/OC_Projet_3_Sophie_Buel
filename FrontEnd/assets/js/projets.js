@@ -36,7 +36,6 @@ var modal;
 document.addEventListener("DOMContentLoaded", function() { 
     modal = document.createElement("div");
     modal.id = "projectModal";
-    modal.innerHTML = "<p>Contenu de la modal</p><button onclick=\"closeModal()\">Fermer la modal</button>";
     document.body.appendChild(modal);
 
     if (isLoggedIn()) {
@@ -49,14 +48,16 @@ document.addEventListener("DOMContentLoaded", function() {
 function openModal() {
     var closeBtn = document.createElement("button");
     closeBtn.id = "closeBtn";
-    closeBtn.innerHTML = "Fermer la modal";
+    var iconeCloseModal = document.createElement('i')
+    iconeCloseModal.className = 'fa-solid fa-xmark'
+    closeBtn.appendChild(iconeCloseModal)
     closeBtn.addEventListener("click", closeModal);
 
-    // Ajouter des éléments à la modal
-    modal.innerHTML = "<p>Contenu de la modal</p>";
     modal.appendChild(closeBtn);
 
-    closeBtn.addEventListener("click", closeModal);
+    var galerieText = document.createElement("p");
+    galerieText.textContent = "Galerie Photo";
+    modal.appendChild(galerieText);
 
     modal.style.display = "block";
 }
