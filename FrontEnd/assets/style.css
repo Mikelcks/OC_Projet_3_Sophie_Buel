@@ -100,7 +100,8 @@ li:hover {
 }
 
 #loginList, 
-#btnModify {
+#btnModify,
+#closeBtn {
 	cursor: pointer;
 }
 
@@ -193,6 +194,7 @@ header a {
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	flex-wrap: wrap;
 	gap: 10px;
 	margin-bottom: 50px;
 }
@@ -230,7 +232,7 @@ header a {
 }
 #contact {
 	width: 50%;
-margin: auto;
+	margin: auto;
 }
 #contact > * {
 	text-align: center;
@@ -282,14 +284,122 @@ footer nav ul {
 	position: fixed;
 	top: 50%;
 	left: 50%;
-	width: 630px;
+	width: 590px;
 	transform: translate(-50%, -50%);
 	background-color: white;
 	padding: 20px;
 	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+	border-radius: 10px;
+	z-index: 11;
+}
+
+#modalOverlay {
+	display: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.7);
+	z-index: 10;
+  }
+
+h3 {
+	font-size: large;
+	text-align: center;
+	margin: 40px 0px;
 }
 
 #closeBtn {
 	background-color: white;
 	border: none;
+	position: absolute;
+	top: 20px;
+	right: 20px;
+}
+
+#miniature-container {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+
+#miniature-gallery {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+	width: 420px;
+}
+
+.miniature {
+	margin: 15px 0px;
+    cursor: pointer;
+}
+
+.miniature img { 
+    height: 100px;
+    object-fit: cover;
+}
+
+#separator-line {
+    width: 420px;
+    border-bottom: 1px solid #ccc;
+    margin: 40px 0px;
+}
+
+#button-add-project {
+	height: 36px;
+    padding: 4px 40px;
+    border-radius: 60px;
+	background-color: #1D6154;
+    color: white;
+    gap: 10px;
+    font-size: 14px;
+	font-weight: 700;
+	cursor: pointer;
+	margin-bottom: 20px;
+}
+
+#add-photo-container {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+#add-photo-label {
+	width: 370px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	background-color: #E8F1F6;
+	padding: 25px;
+	border-radius: 5px;
+}
+
+.fa-image {
+	font-size: 4em;
+	color: #CBD6DC;
+}
+
+#button-add-photo {
+	height: 36px;
+    padding: 4px 40px;
+    border-radius: 60px;
+	border: none;
+	background-color: #CBD6DC;
+    color: #306685;
+    gap: 10px;
+    font-size: 14px;
+	font-weight: 500;
+	cursor: pointer;
+	margin: 10px;
+}
+
+#add-photo-container p {
+	font-size: 10px;
+	font-weight: 400;
+	color: #444444;
 }

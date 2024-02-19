@@ -1,4 +1,3 @@
-import { API_PREFIX } from './consts.js';
 
 const performLogin = () => {
     // Récupérer les valeurs du formulaire
