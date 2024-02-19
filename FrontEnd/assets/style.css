@@ -382,6 +382,7 @@ h3 {
 
 #add-photo-div {
 	width: 370px;
+	min-height: 129px;
 	display: flex;
 	flex-direction: column;
 	align-items: center;

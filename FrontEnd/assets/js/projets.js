@@ -141,23 +141,59 @@ function addNewProject() {
     iconeAddPhoto.className = 'fa-regular fa-image';
     addPhotoDiv.appendChild(iconeAddPhoto);
 
+    const btnAddPhoto = document.createElement("button");
+    btnAddPhoto.id = "button-add-photo";
+    btnAddPhoto.innerHTML = "+ Ajouter photo";
+    addPhotoDiv.appendChild(btnAddPhoto);
 
+    btnAddPhoto.addEventListener("click", function () {
+    var fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.accept = ".jpg, .jpeg, .png";
+    fileInput.maxSize = 4 * 1024 * 1024;
 
-    const btnAddProject = document.createElement("input");
-    btnAddProject.type = "file";
-    btnAddProject.id = "input-add-photo";
-    btnAddProject.accept = "image/*";
-    addPhotoDiv.appendChild(btnAddProject);
+    fileInput.addEventListener("change", function (event) {
+        const file = event.target.files[0];
 
-    const labelAddPhoto = document.createElement("label");
-    labelAddPhoto.htmlFor = "input-add-photo";
-    labelAddPhoto.innerHTML = "+ Ajouter photo";
-    addPhotoDiv.appendChild(labelAddPhoto);
+        if (file) {
+            const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
+            if (allowedTypes.includes(file.type)) {
+                if (file.size <= fileInput.maxSize) {
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        var img = new Image();
+                        img.src = e.target.result;
 
-    btnAddProject.addEventListener("change", (event) => {
-        handleFileSelect(event);
+                        img.onload = function () {
+                            var aspectRatio = img.width / img.height;
+
+                            var targetWidth = addPhotoDiv.clientWidth;
+                            var targetHeight = targetWidth / aspectRatio;
+
+                            if (targetHeight > addPhotoDiv.clientHeight) {
+                                targetHeight = addPhotoDiv.clientHeight;
+                                targetWidth = targetHeight * aspectRatio;
+                            }
+
+                            addPhotoDiv.innerHTML = "";
+                            addPhotoDiv.style.backgroundImage = `url(${img.src})`;
+                            addPhotoDiv.style.backgroundSize = `${targetWidth}px ${targetHeight}px`;
+                            addPhotoDiv.style.backgroundRepeat = "no-repeat";
+                            addPhotoDiv.style.backgroundPosition = "center center";
+                        };
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    alert("La taille du fichier dépasse la limite de 4 Mo.");
+                }
+            } else {
+                alert("Veuillez sélectionner un fichier au format jpg, jpeg ou png.");
+            }
+        }
     });
 
+    fileInput.click();
+});
 
     const photoFormat = document.createElement("p");
     photoFormat.textContent = "jpg, png : 4mo max";    
@@ -222,10 +258,47 @@ function addNewProject() {
     addPhotoContainer.appendChild(btnSubmitProject);
 
     btnSubmitProject.addEventListener("click", () => {
-        addNewProject();
-    });
+        const title = inputTitleAddPhoto.value.trim();
+        const category = selectCategoryAddPhoto.value;
+        const image = addPhotoDiv.style.backgroundImage.replace('url("', '').replace('")', '');
 
-}
+    if (title && category && image) {
+        const newProjectData = {
+            title: title,
+            category: category,
+            image: image,
+        };
+
+        const accessToken = localStorage.getItem('token');
+        if (accessToken) {
+            fetch('http://localhost:5678/api/works', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`,
+                },
+                body: JSON.stringify(newProjectData),
+            })
+            .then(response => {
+                if (response.ok) {
+                    // La requête a réussi, vous pouvez gérer la suite ici
+                    console.log("Projet ajouté avec succès !");
+                    // Vous pouvez également mettre à jour l'interface utilisateur ou effectuer d'autres actions nécessaires
+                } else {
+                    // La requête a échoué, gérer les erreurs ici
+                    console.error('Erreur lors de l\'ajout du projet à l\'API:', response.statusText);
+                }
+            })
+            .catch(error => {
+                console.error('Erreur lors de la requête POST vers l\'API:', error);
+            });
+        } else {
+            // Afficher un message d'erreur si certaines données sont manquantes
+            alert("Veuillez remplir tous les champs avant de valider le projet.");
+        }
+    }});
+
+};
 
 function creerMiniature(projet) {
     const miniatureElement = document.createElement("div");
