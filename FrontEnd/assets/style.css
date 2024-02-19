@@ -99,6 +99,11 @@ li:hover {
 	color: #B1663C;
 }
 
+#loginList, 
+#btnModify {
+	cursor: pointer;
+}
+
 header a {
     text-decoration: none;
     color: inherit; 
@@ -176,7 +181,6 @@ header a {
 	gap: 10px;
 }
 
-
 #portfolio-title ::after { 
     display: inline-block;
 }
@@ -204,9 +208,10 @@ header a {
     gap: 10px;
     font-size: 16px;
 	font-weight: 700;
+	cursor: pointer;
 }
 
-.filter_button:active {
+.filter_button:focus {
 	background-color: #1D6154;
 	color: white;
 }
@@ -272,3 +277,13 @@ footer nav ul {
 	margin: 2em
 }
 
+#projectModal {
+	display: none;
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	background-color: white;
+	padding: 20px;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}

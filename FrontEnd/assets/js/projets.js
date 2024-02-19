@@ -14,21 +14,55 @@ async function chargerProjets() {
 function creerBtnModify() {
     var parentElement = document.getElementById('spanBtnModify');
   
-    var bouton = document.createElement('button');
+    var button = document.createElement('button');
   
-    bouton.id = 'btnModify';
+    button.id = 'btnModify';
   
-    bouton.className = 'modif_button';
+    button.className = 'modif_button';
   
     var icone = document.createElement('i');
     icone.className = 'fa-regular fa-pen-to-square'; 
-    bouton.appendChild(icone);
+    button.appendChild(icone);
   
     var texteSpan = document.createElement('span');
     texteSpan.innerHTML = ' modifier';
-    bouton.appendChild(texteSpan);
+    button.appendChild(texteSpan);
 
-    parentElement.appendChild(bouton);
+    parentElement.appendChild(button);
+}
+
+var modal;
+
+document.addEventListener("DOMContentLoaded", function() { 
+    modal = document.createElement("div");
+    modal.id = "projectModal";
+    modal.innerHTML = "<p>Contenu de la modal</p><button onclick=\"closeModal()\">Fermer la modal</button>";
+    document.body.appendChild(modal);
+
+    if (isLoggedIn()) {
+        creerBtnModify();
+        var btnModify = document.getElementById("btnModify");
+        btnModify.addEventListener("click", openModal);
+    }
+});
+
+function openModal() {
+    var closeBtn = document.createElement("button");
+    closeBtn.id = "closeBtn";
+    closeBtn.innerHTML = "Fermer la modal";
+    closeBtn.addEventListener("click", closeModal);
+
+    // Ajouter des éléments à la modal
+    modal.innerHTML = "<p>Contenu de la modal</p>";
+    modal.appendChild(closeBtn);
+
+    closeBtn.addEventListener("click", closeModal);
+
+    modal.style.display = "block";
+}
+
+function closeModal() {
+    modal.style.display = "none";
 }
 
 function creerHeaderEdition () {
@@ -54,7 +88,6 @@ const projets = await chargerProjets();
 genererProjet(projets);
 
     if (isLoggedIn()) {
-        creerBtnModify();
         creerHeaderEdition();
         document.getElementById("loginList").innerText = "";
         document.getElementById("loginList").innerText = "logout";
@@ -63,16 +96,17 @@ genererProjet(projets);
 
     const boutonTrierTous = document.getElementById("btnTous");
     boutonTrierTous.addEventListener("click", function () {
-        const tous = projets.filter(function (projet) {
-            return projet.category.id;
+        chargerEtGenererProjet(async () => {
+            const tous = projets.filter(function (projet) {
+                return projet.category.id;
+            });
+            console.log(tous);
         });
-        document.querySelector(".gallery").innerHTML = "";
-        genererProjet(tous)
-        console.log(tous);
     });
 
     const boutonTrierObjets = document.getElementById("btnObjets");
     boutonTrierObjets.addEventListener("click", function () {
+        chargerEtGenererProjet(async () => {
         const objets = projets.filter(function (projet) {
             return projet.category.id === 1;
         });
@@ -80,9 +114,11 @@ genererProjet(projets);
         genererProjet(objets)
         console.log(objets);
     });
+    });
 
     const boutonTrierAppartements = document.getElementById("btnAppartements");
     boutonTrierAppartements.addEventListener("click", function () {
+        chargerEtGenererProjet(async () => {
         const appartements = projets.filter(function (projet) {
             return projet.category.id === 2;
         });
@@ -90,15 +126,30 @@ genererProjet(projets);
         genererProjet(appartements)
         console.log(appartements);
     });
+    });
 
     const boutonTrierHotels_Restaurants = document.getElementById("btnHotels_Restaurants");
     boutonTrierHotels_Restaurants.addEventListener("click", function () {
+        chargerEtGenererProjet(async () => {
         const Hotels_Restaurants = projets.filter(function (projet) {
             return projet.category.id === 3;
         });
         document.querySelector(".gallery").innerHTML = "";
         genererProjet(Hotels_Restaurants)
         console.log(Hotels_Restaurants);
+    });
+    });
+}
+
+function chargerEtGenererProjet(callback) {
+    chargerProjets().then(projets => {
+        document.querySelector(".gallery").innerHTML = "";
+        genererProjet(projets);
+        if (callback) {
+            callback(projets);
+        }
+    }).catch(error => {
+        console.error("Erreur lors du chargement des projets :", error);
     });
 }
 
