@@ -146,11 +146,12 @@ function addNewProject() {
     btnAddPhoto.innerHTML = "+ Ajouter photo";
     addPhotoDiv.appendChild(btnAddPhoto);
 
-    btnAddPhoto.addEventListener("click", function () {
     var fileInput = document.createElement("input");
     fileInput.type = "file";
     fileInput.accept = ".jpg, .jpeg, .png";
     fileInput.maxSize = 4 * 1024 * 1024;
+
+    btnAddPhoto.addEventListener("click", function () {
 
     fileInput.addEventListener("change", function (event) {
         const file = event.target.files[0];
@@ -165,19 +166,34 @@ function addNewProject() {
                         img.src = e.target.result;
 
                         img.onload = function () {
+                            var maxWidth = 610;
+                            var maxHeight = 814;
+    
                             var aspectRatio = img.width / img.height;
-
+    
                             var targetWidth = addPhotoDiv.clientWidth;
                             var targetHeight = targetWidth / aspectRatio;
-
+    
                             if (targetHeight > addPhotoDiv.clientHeight) {
                                 targetHeight = addPhotoDiv.clientHeight;
                                 targetWidth = targetHeight * aspectRatio;
                             }
-
+    
+                            var canvas = document.createElement("canvas");
+                            var ctx = canvas.getContext("2d");
+    
+                            canvas.width = targetWidth;
+                            canvas.height = targetHeight;
+    
+                            ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
+    
+                            var resizedImgDataUrl = canvas.toDataURL(file.type);
+    
                             addPhotoDiv.innerHTML = "";
-                            addPhotoDiv.style.backgroundImage = `url(${img.src})`;
+                            addPhotoDiv.style.backgroundImage = `url(${resizedImgDataUrl})`;
                             addPhotoDiv.style.backgroundSize = `${targetWidth}px ${targetHeight}px`;
+                            addPhotoDiv.style.width = `${addPhotoDiv.clientWidth}px`;
+                            addPhotoDiv.style.height = `${addPhotoDiv.clientHeight}px`;
                             addPhotoDiv.style.backgroundRepeat = "no-repeat";
                             addPhotoDiv.style.backgroundPosition = "center center";
                         };
@@ -217,10 +233,14 @@ function addNewProject() {
     infoPhotoContainer.appendChild(categoryAddPhoto);
     infoPhotoContainer.appendChild(selectCategoryAddPhoto);
     
-    fetch('http://localhost:5678/api/categories')
+    fetch( API_PREFIX + 'categories')
     .then(response => response.json())
     .then(data => {
-        selectCategoryAddPhoto.innerHTML = "";
+
+        const emptyOptionElement = document.createElement("option");
+        emptyOptionElement.value = "";
+        emptyOptionElement.text = "";
+        selectCategoryAddPhoto.appendChild(emptyOptionElement);
         
         data.forEach(category => {
             const optionElement = document.createElement("option");
@@ -251,53 +271,42 @@ function addNewProject() {
     function validateForm() {
         const isTitleFilled = inputTitleAddPhoto.value.trim() !== "";
         const isCategorySelected = selectCategoryAddPhoto.value !== "";
+    const isFileSelected = fileInput.files.length > 0;
 
-        btnSubmitProject.disabled = !(isTitleFilled && isCategorySelected);
+    btnSubmitProject.disabled = !(isTitleFilled && isCategorySelected && isFileSelected);
     }
 
     addPhotoContainer.appendChild(btnSubmitProject);
 
-    btnSubmitProject.addEventListener("click", () => {
-        const title = inputTitleAddPhoto.value.trim();
+    btnSubmitProject.addEventListener("click", e => {
+        e.preventDefault();
+        const title = inputTitleAddPhoto.value;
         const category = selectCategoryAddPhoto.value;
-        const image = addPhotoDiv.style.backgroundImage.replace('url("', '').replace('")', '');
+        const accessToken = localStorage.getItem('token');
 
-    if (title && category && image) {
-        const newProjectData = {
+        const inputData = {
             title: title,
             category: category,
-            image: image,
-        };
-
-        const accessToken = localStorage.getItem('token');
-        if (accessToken) {
-            fetch('http://localhost:5678/api/works', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${accessToken}`,
-                },
-                body: JSON.stringify(newProjectData),
-            })
-            .then(response => {
-                if (response.ok) {
-                    // La requête a réussi, vous pouvez gérer la suite ici
-                    console.log("Projet ajouté avec succès !");
-                    // Vous pouvez également mettre à jour l'interface utilisateur ou effectuer d'autres actions nécessaires
-                } else {
-                    // La requête a échoué, gérer les erreurs ici
-                    console.error('Erreur lors de l\'ajout du projet à l\'API:', response.statusText);
-                }
-            })
-            .catch(error => {
-                console.error('Erreur lors de la requête POST vers l\'API:', error);
-            });
-        } else {
-            // Afficher un message d'erreur si certaines données sont manquantes
-            alert("Veuillez remplir tous les champs avant de valider le projet.");
         }
-    }});
 
+        console.log('Données à envoyer à l\'API :', inputData);
+
+        fetch(API_PREFIX + 'works', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`,
+            },
+            body: JSON.stringify(inputData),
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Réponse de l\'API :', data);
+        })
+        .catch(error => {
+            console.error('Erreur lors de l\'envoi des données à l\'API :', error);
+        });
+    })
 };
 
 function creerMiniature(projet) {
