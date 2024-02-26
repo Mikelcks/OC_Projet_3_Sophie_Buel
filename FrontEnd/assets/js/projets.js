@@ -153,12 +153,12 @@ function addNewProject() {
     fileInput.accept = ".jpg, .jpeg, .png";
     fileInput.maxSize = 4 * 1024 * 1024;
 
+    let file
     btnAddPhoto.addEventListener("click", function () {
-
     let resizedImgDataUrl;
 
     fileInput.addEventListener("change", function (event) {
-        const file = event.target.files[0];
+        file = event.target.files[0];
 
         if (file) {
             const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
@@ -192,8 +192,6 @@ function addNewProject() {
                             ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
     
                             resizedImgDataUrl = canvas.toDataURL(file.type);
-
-                            console.log('resizedImgDataUrl:', resizedImgDataUrl);
     
                             addPhotoDiv.innerHTML = "";
                             addPhotoDiv.style.backgroundImage = `url(${resizedImgDataUrl})`;
@@ -298,11 +296,9 @@ function addNewProject() {
         const categoryId = selectCategoryAddPhoto.value;
         const accessToken = localStorage.getItem('token');
 
-        console.log('Token d\'accès :', accessToken);
-
         const formData = new FormData();
 
-        formData.append('image', new Blob([resizedImgDataUrl], { type: 'image/png' }), 'image.png');
+        formData.append('image', file);
         formData.append('title', title);
         formData.append('category', categoryId);
         formData.append('userId', userId);
@@ -375,8 +371,6 @@ genererProjet(projets);
         document.getElementById("loginList").innerText = "logout";
         logOut();
         userId = "1";
-        const accessToken = localStorage.getItem('token');
-        console.log('Token d\'accès :', accessToken);
     }
 
     const boutonTrierTous = document.getElementById("btnTous");
