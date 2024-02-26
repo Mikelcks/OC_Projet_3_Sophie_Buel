@@ -35,6 +35,8 @@ var modal;
 var overlay;
 var projets;
 var btnAddProject;
+var userId;
+var resizedImgDataUrl;
 
 document.addEventListener("DOMContentLoaded", function() { 
     modal = document.createElement("div");
@@ -153,6 +155,8 @@ function addNewProject() {
 
     btnAddPhoto.addEventListener("click", function () {
 
+    let resizedImgDataUrl;
+
     fileInput.addEventListener("change", function (event) {
         const file = event.target.files[0];
 
@@ -187,7 +191,9 @@ function addNewProject() {
     
                             ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
     
-                            var resizedImgDataUrl = canvas.toDataURL(file.type);
+                            resizedImgDataUrl = canvas.toDataURL(file.type);
+
+                            console.log('resizedImgDataUrl:', resizedImgDataUrl);
     
                             addPhotoDiv.innerHTML = "";
                             addPhotoDiv.style.backgroundImage = `url(${resizedImgDataUrl})`;
@@ -209,7 +215,7 @@ function addNewProject() {
     });
 
     fileInput.click();
-});
+    });
 
     const photoFormat = document.createElement("p");
     photoFormat.textContent = "jpg, png : 4mo max";    
@@ -260,6 +266,8 @@ function addNewProject() {
     btnSubmitProject.id = "button-submit-project";
     btnSubmitProject.innerHTML = "Valider"
 
+    validateForm();
+
     inputTitleAddPhoto.addEventListener("input", function () {
         validateForm();
     });
@@ -271,9 +279,15 @@ function addNewProject() {
     function validateForm() {
         const isTitleFilled = inputTitleAddPhoto.value.trim() !== "";
         const isCategorySelected = selectCategoryAddPhoto.value !== "";
-    const isFileSelected = fileInput.files.length > 0;
+        const isFileSelected = fileInput.files.length > 0;
 
-    btnSubmitProject.disabled = !(isTitleFilled && isCategorySelected && isFileSelected);
+        btnSubmitProject.disabled = !(isTitleFilled && isCategorySelected && isFileSelected);
+
+    if (btnSubmitProject.disabled) {
+        btnSubmitProject.style.cursor = "not-allowed";
+    } else {
+        btnSubmitProject.style.cursor = "pointer";
+    }
     }
 
     addPhotoContainer.appendChild(btnSubmitProject);
@@ -281,33 +295,38 @@ function addNewProject() {
     btnSubmitProject.addEventListener("click", e => {
         e.preventDefault();
         const title = inputTitleAddPhoto.value;
-        const category = selectCategoryAddPhoto.value;
+        const categoryId = selectCategoryAddPhoto.value;
         const accessToken = localStorage.getItem('token');
 
-        const inputData = {
-            title: title,
-            category: category,
-        }
+        console.log('Token d\'accès :', accessToken);
 
-        console.log('Données à envoyer à l\'API :', inputData);
+        const formData = new FormData();
+
+        formData.append('image', new Blob([resizedImgDataUrl], { type: 'image/png' }), 'image.png');
+        formData.append('title', title);
+        formData.append('category', categoryId);
+        formData.append('userId', userId);
 
         fetch(API_PREFIX + 'works', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
                 'Authorization': `Bearer ${accessToken}`,
             },
-            body: JSON.stringify(inputData),
+            body: formData,
         })
         .then(response => response.json())
         .then(data => {
             console.log('Réponse de l\'API :', data);
+            chargerProjets().then(projetsCharge => {
+                document.querySelector(".gallery").innerHTML = "";
+                genererProjet(projetsCharge);
+            });
         })
         .catch(error => {
             console.error('Erreur lors de l\'envoi des données à l\'API :', error);
         });
-    })
-};
+    });
+}
 
 function creerMiniature(projet) {
     const miniatureElement = document.createElement("div");
@@ -355,6 +374,9 @@ genererProjet(projets);
         document.getElementById("loginList").innerText = "";
         document.getElementById("loginList").innerText = "logout";
         logOut();
+        userId = "1";
+        const accessToken = localStorage.getItem('token');
+        console.log('Token d\'accès :', accessToken);
     }
 
     const boutonTrierTous = document.getElementById("btnTous");
@@ -441,4 +463,3 @@ for (let i = 0; i < projets.length; i++) {
 
 // Appel de la fonction pour initialiser la page
 initialiserPage();
-
