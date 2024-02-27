@@ -335,8 +335,9 @@ h3 {
 }
 
 .miniature {
+	display: flex;
+	position: relative;
 	margin: 15px 0px;
-    cursor: pointer;
 }
 
 .miniature img { 
@@ -453,4 +454,16 @@ h4 {
     font-size: 14px;
 	font-weight: 500;
 	cursor: pointer;
+}
+
+#deleteBtn {
+	position: absolute;
+	top: 6px;
+	right: 5px;
+	background: black;
+	color: white;
+	border: none;
+	cursor: pointer;
+	border-radius: 3px;
+	padding: 3px 4px;
 }

@@ -332,7 +332,14 @@ function creerMiniature(projet) {
     miniatureImage.src = projet.imageUrl;
     miniatureImage.alt = projet.title;
 
+    const deleteBtn = document.createElement("button");
+    deleteBtn.id = "deleteBtn";
+    const iconeTrashCan = document.createElement('i')
+    iconeTrashCan.className = 'fa-solid fa-trash-can'
+    deleteBtn.appendChild(iconeTrashCan)
+
     miniatureElement.appendChild(miniatureImage);
+    miniatureElement.appendChild(deleteBtn);
 
     return miniatureElement;
 }
