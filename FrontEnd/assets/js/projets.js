@@ -12,31 +12,29 @@ async function chargerProjets() {
 }
 
 function creerBtnModify() {
-    var parentElement = document.getElementById('spanBtnModify');
+    let parentElement = document.getElementById('spanBtnModify');
   
-    var button = document.createElement('button');
+    let button = document.createElement('button');
   
     button.id = 'btnModify';
   
     button.className = 'modif_button';
   
-    var icone = document.createElement('i');
+    let icone = document.createElement('i');
     icone.className = 'fa-regular fa-pen-to-square'; 
     button.appendChild(icone);
   
-    var texteSpan = document.createElement('span');
+    let texteSpan = document.createElement('span');
     texteSpan.innerHTML = ' modifier';
     button.appendChild(texteSpan);
 
     parentElement.appendChild(button);
 }
 
-var modal;
-var overlay;
-var projets;
-var btnAddProject;
-var userId;
-var resizedImgDataUrl;
+let modal;
+let overlay;
+let projets;
+let userId;
 
 document.addEventListener("DOMContentLoaded", function() { 
     modal = document.createElement("div");
@@ -49,7 +47,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     if (isLoggedIn()) {
         creerBtnModify();
-        var btnModify = document.getElementById("btnModify");
+        let btnModify = document.getElementById("btnModify");
         btnModify.addEventListener("click", openModal);
     }
 
@@ -65,9 +63,9 @@ function openModal() {
     modal.innerHTML = "";
 
     btnModify.disabled = true;
-    var closeBtn = document.createElement("button");
+    let closeBtn = document.createElement("button");
     closeBtn.id = "closeBtn";
-    var iconeCloseModal = document.createElement('i')
+    let iconeCloseModal = document.createElement('i')
     iconeCloseModal.className = 'fa-solid fa-xmark'
     closeBtn.appendChild(iconeCloseModal)
     closeBtn.addEventListener("click", () => {
@@ -117,9 +115,9 @@ function openModal() {
 function addNewProject() {
     modal.innerHTML = ""
 
-    var previousBtn = document.createElement("button");
+    let previousBtn = document.createElement("button");
     previousBtn.id = "previousBtn";
-    var iconePreviousModal = document.createElement('i')
+    let iconePreviousModal = document.createElement('i')
     iconePreviousModal.className = 'fa-solid fa-arrow-left'
     previousBtn.appendChild(iconePreviousModal)
     previousBtn.addEventListener("click", () => {
@@ -148,7 +146,7 @@ function addNewProject() {
     btnAddPhoto.innerHTML = "+ Ajouter photo";
     addPhotoDiv.appendChild(btnAddPhoto);
 
-    var fileInput = document.createElement("input");
+    let fileInput = document.createElement("input");
     fileInput.type = "file";
     fileInput.accept = ".jpg, .jpeg, .png";
     fileInput.maxSize = 4 * 1024 * 1024;
@@ -164,40 +162,25 @@ function addNewProject() {
             const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
             if (allowedTypes.includes(file.type)) {
                 if (file.size <= fileInput.maxSize) {
-                    var reader = new FileReader();
+                    let reader = new FileReader();
                     reader.onload = function (e) {
-                        var img = new Image();
+                        let img = new Image();
                         img.src = e.target.result;
 
                         img.onload = function () {
-                            var maxWidth = 610;
-                            var maxHeight = 814;
-
-                            if (img.width > maxWidth || img.height > maxHeight) {
-                                if (img.width / maxWidth > img.height / maxHeight) {
-                                    targetWidth = maxWidth;
-                                    targetHeight = targetWidth / aspectRatio;
-                                } else {
-                                    targetHeight = maxHeight;
-                                    targetWidth = targetHeight * aspectRatio;
-                                }
-                            } else {
-                                targetWidth = img.width;
-                                targetHeight = img.height;
-                            }
+   
+                            let aspectRatio = img.width / img.height;
     
-                            var aspectRatio = img.width / img.height;
-    
-                            var targetWidth = addPhotoDiv.clientWidth;
-                            var targetHeight = targetWidth / aspectRatio;
+                            let targetWidth = addPhotoDiv.clientWidth;
+                            let targetHeight = targetWidth / aspectRatio;
     
                             if (targetHeight > addPhotoDiv.clientHeight) {
                                 targetHeight = addPhotoDiv.clientHeight;
                                 targetWidth = targetHeight * aspectRatio;
                             }
     
-                            var canvas = document.createElement("canvas");
-                            var ctx = canvas.getContext("2d");
+                            let canvas = document.createElement("canvas");
+                            let ctx = canvas.getContext("2d");
     
                             canvas.width = targetWidth;
                             canvas.height = targetHeight;
@@ -375,7 +358,8 @@ function createMiniature(projet) {
     iconeTrashCan.className = 'fa-solid fa-trash-can'
     deleteBtn.appendChild(iconeTrashCan)
 
-    deleteBtn.addEventListener('click', () => {
+    deleteBtn.addEventListener('click', e => {
+        e.preventDefault();
         const projectId = projet.id;
 
         deleteProject(projectId);
@@ -394,19 +378,19 @@ function closeModal() {
 }
 
 function creerHeaderEdition () {
-    var headerEditionDiv = document.createElement('div');
+    let headerEditionDiv = document.createElement('div');
 
     headerEditionDiv .id = 'headerEdition';
 
-    var icone = document.createElement('i')
+    let icone = document.createElement('i')
     icone.className = 'fa-regular fa-pen-to-square'; 
     headerEditionDiv.appendChild(icone);
 
-    var texteSpan = document.createElement('span');
+    let texteSpan = document.createElement('span');
     texteSpan.innerHTML = ' Mode édition';
     headerEditionDiv.appendChild(texteSpan);
 
-    var body = document.getElementById('body')
+    let body = document.getElementById('body')
 
     body.insertBefore(headerEditionDiv, body.firstChild);
 }
