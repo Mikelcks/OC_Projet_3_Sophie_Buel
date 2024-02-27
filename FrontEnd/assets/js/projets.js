@@ -92,7 +92,7 @@ function openModal() {
     miniatureContainer.appendChild(miniatureGallery);
 
     projets.forEach((projet) => {
-        const miniature = creerMiniature(projet);
+        const miniature = createMiniature(projet);
         miniatureGallery.appendChild(miniature);
     });
 
@@ -172,6 +172,19 @@ function addNewProject() {
                         img.onload = function () {
                             var maxWidth = 610;
                             var maxHeight = 814;
+
+                            if (img.width > maxWidth || img.height > maxHeight) {
+                                if (img.width / maxWidth > img.height / maxHeight) {
+                                    targetWidth = maxWidth;
+                                    targetHeight = targetWidth / aspectRatio;
+                                } else {
+                                    targetHeight = maxHeight;
+                                    targetWidth = targetHeight * aspectRatio;
+                                }
+                            } else {
+                                targetWidth = img.width;
+                                targetHeight = img.height;
+                            }
     
                             var aspectRatio = img.width / img.height;
     
@@ -324,7 +337,31 @@ function addNewProject() {
     });
 }
 
-function creerMiniature(projet) {
+function deleteProject(id) {
+    const apiUrl = API_PREFIX + 'works/' + id;
+    const accessToken = localStorage.getItem('token');
+
+    fetch(apiUrl, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${accessToken}`,
+        },
+    })
+    .then(response => {
+        if (response.ok) {
+            console.log('Projet supprimé avec succès');
+        } else if (response.status === 401) {
+            console.error('Non autorisé');
+        } else {
+            console.error('Erreur inattendue:', response.status);
+        }
+    })
+    .catch(error => {
+        console.error('Erreur lors de la suppression du projet:', error);
+    });
+}
+
+function createMiniature(projet) {
     const miniatureElement = document.createElement("div");
     miniatureElement.classList.add("miniature");
 
@@ -337,6 +374,12 @@ function creerMiniature(projet) {
     const iconeTrashCan = document.createElement('i')
     iconeTrashCan.className = 'fa-solid fa-trash-can'
     deleteBtn.appendChild(iconeTrashCan)
+
+    deleteBtn.addEventListener('click', () => {
+        const projectId = projet.id;
+
+        deleteProject(projectId);
+    });
 
     miniatureElement.appendChild(miniatureImage);
     miniatureElement.appendChild(deleteBtn);

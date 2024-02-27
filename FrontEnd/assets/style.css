@@ -330,14 +330,14 @@ h3 {
 #miniature-gallery {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
+    gap: 11px;
 	width: 420px;
 }
 
 .miniature {
 	display: flex;
 	position: relative;
-	margin: 15px 0px;
+	margin: 10px 0px;
 }
 
 .miniature img { 
