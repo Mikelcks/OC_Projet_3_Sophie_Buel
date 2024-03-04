@@ -11,7 +11,7 @@ async function chargerProjets() {
     return projets;
 }
 
-function creerBtnModify() {
+function createBtnModify() {
     let parentElement = document.getElementById('spanBtnModify');
   
     let button = document.createElement('button');
@@ -31,6 +31,25 @@ function creerBtnModify() {
     parentElement.appendChild(button);
 }
 
+function createHeaderEdition() {
+    let headerEditionDiv = document.createElement('div');
+
+    headerEditionDiv .id = 'headerEdition';
+
+    let icone = document.createElement('i')
+    icone.className = 'fa-regular fa-pen-to-square'; 
+    headerEditionDiv.appendChild(icone);
+
+    let texteSpan = document.createElement('span');
+    texteSpan.innerHTML = ' Mode édition';
+    texteSpan.id = "text-edition_mode";
+    headerEditionDiv.appendChild(texteSpan);
+
+    let body = document.getElementById('body')
+
+    body.insertBefore(headerEditionDiv, body.firstChild);
+}
+
 let modal;
 let overlay;
 let projets;
@@ -46,9 +65,13 @@ document.addEventListener("DOMContentLoaded", function() {
     document.body.appendChild(overlay);
 
     if (isLoggedIn()) {
-        creerBtnModify();
+        createBtnModify();
         let btnModify = document.getElementById("btnModify");
         btnModify.addEventListener("click", openModal);
+
+        createHeaderEdition();
+        let textEditionMode = document.getElementById("text-edition_mode");
+        textEditionMode.addEventListener("click", openModal);
     }
 
     overlay.addEventListener("click", function(event) {
@@ -260,63 +283,74 @@ function addNewProject() {
     btnSubmitProject.id = "button-submit-project";
     btnSubmitProject.innerHTML = "Valider"
 
+    
+    
     validateForm();
-
+    
     inputTitleAddPhoto.addEventListener("input", function () {
         validateForm();
     });
-
+    
     selectCategoryAddPhoto.addEventListener("change", function () {
         validateForm();
     });
-
+    
     function validateForm() {
         const isTitleFilled = inputTitleAddPhoto.value.trim() !== "";
         const isCategorySelected = selectCategoryAddPhoto.value !== "";
         const isFileSelected = fileInput.files.length > 0;
-
+        
         btnSubmitProject.disabled = !(isTitleFilled && isCategorySelected && isFileSelected);
-
-    if (btnSubmitProject.disabled) {
-        btnSubmitProject.style.cursor = "not-allowed";
-    } else {
-        btnSubmitProject.style.cursor = "pointer";
+        
+        if (btnSubmitProject.disabled) {
+            btnSubmitProject.style.cursor = "not-allowed";
+        } else {
+            btnSubmitProject.style.cursor = "pointer";
+        }
     }
-    }
-
+    
     addPhotoContainer.appendChild(btnSubmitProject);
 
+    let errorMessage = document.createElement("p");
+    errorMessage.id = "error-message-project";
+    addPhotoContainer.appendChild(errorMessage)
+    
     btnSubmitProject.addEventListener("click", e => {
-        e.preventDefault();
         const title = inputTitleAddPhoto.value;
         const categoryId = selectCategoryAddPhoto.value;
+        const image = fileInput.value;
         const accessToken = localStorage.getItem('token');
-
+        
         const formData = new FormData();
-
+        
         formData.append('image', file);
         formData.append('title', title);
         formData.append('category', categoryId);
         formData.append('userId', userId);
-
-        fetch(API_PREFIX + 'works', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${accessToken}`,
-            },
-            body: formData,
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log('Réponse de l\'API :', data);
-            chargerProjets().then(projetsCharge => {
-                document.querySelector(".gallery").innerHTML = "";
-                genererProjet(projetsCharge);
+        
+        if (title && categoryId && image) {
+            fetch(API_PREFIX + 'works', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                },
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Réponse de l\'API :', data);
+                chargerProjets().then(projetsCharge => {
+                    document.querySelector(".gallery").innerHTML = "";
+                    genererProjet(projetsCharge);
+                });
+            })
+            .catch(error => {
+                console.error('Erreur lors de l\'envoi des données à l\'API :', error);
             });
-        })
-        .catch(error => {
-            console.error('Erreur lors de l\'envoi des données à l\'API :', error);
-        });
+            e.preventDefault();
+        } else { 
+            errorMessage.innerHTML = "Merci de bien remplir tous les champs du formulaire (image, titre & catégorie)"
+        }
     });
 }
 
@@ -353,16 +387,16 @@ function createMiniature(projet) {
     miniatureImage.alt = projet.title;
 
     const deleteBtn = document.createElement("button");
-    deleteBtn.id = "deleteBtn";
+    deleteBtn.className = "deleteBtn";
     const iconeTrashCan = document.createElement('i')
     iconeTrashCan.className = 'fa-solid fa-trash-can'
     deleteBtn.appendChild(iconeTrashCan)
 
     deleteBtn.addEventListener('click', e => {
-        e.preventDefault();
         const projectId = projet.id;
-
+        
         deleteProject(projectId);
+        e.preventDefault();
     });
 
     miniatureElement.appendChild(miniatureImage);
@@ -377,30 +411,12 @@ function closeModal() {
     overlay.style.display = "none";
 }
 
-function creerHeaderEdition () {
-    let headerEditionDiv = document.createElement('div');
-
-    headerEditionDiv .id = 'headerEdition';
-
-    let icone = document.createElement('i')
-    icone.className = 'fa-regular fa-pen-to-square'; 
-    headerEditionDiv.appendChild(icone);
-
-    let texteSpan = document.createElement('span');
-    texteSpan.innerHTML = ' Mode édition';
-    headerEditionDiv.appendChild(texteSpan);
-
-    let body = document.getElementById('body')
-
-    body.insertBefore(headerEditionDiv, body.firstChild);
-}
 
 async function initialiserPage() {
 projets = await chargerProjets();
 genererProjet(projets);
 
     if (isLoggedIn()) {
-        creerHeaderEdition();
         document.getElementById("loginList").innerText = "";
         document.getElementById("loginList").innerText = "logout";
         logOut();

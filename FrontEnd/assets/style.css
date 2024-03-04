@@ -456,7 +456,7 @@ h4 {
 	cursor: pointer;
 }
 
-#deleteBtn {
+.deleteBtn {
 	position: absolute;
 	top: 6px;
 	right: 5px;
@@ -466,4 +466,9 @@ h4 {
 	cursor: pointer;
 	border-radius: 3px;
 	padding: 3px 4px;
+}
+
+#error-message-project {
+	color: red !important;
+	font-size: 15px !important;
 }
