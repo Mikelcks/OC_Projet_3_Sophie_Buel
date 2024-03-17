@@ -1,4 +1,4 @@
-export const logOut = () => {
+export const logOutEvent = () => {
     const loginList = document.getElementById("loginList");
 
     if (loginList.textContent === "logout") {
