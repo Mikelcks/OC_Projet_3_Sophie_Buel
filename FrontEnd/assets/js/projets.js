@@ -219,6 +219,7 @@ function addNewProject() {
 
   let file;
   btnAddPhoto.addEventListener("click", function () {
+    let resizedImgDataUrl;
 
     fileInput.addEventListener("change", function (event) {
       file = event.target.files[0];
