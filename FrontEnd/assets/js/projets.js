@@ -1,14 +1,49 @@
 import { API_PREFIX } from "./consts.js";
-import { logOutEvent } from "./functions.js";
+import {
+  logOutEvent,
+  generateProject,
+  loadProjects,
+  loadAndGenerateProject,
+  generateButtons,
+} from "./functions.js";
+
+async function initialiserPage() {
+  projects = await loadProjects();
+  generateProject(projects);
+
+  if (isLoggedIn()) {
+    document.getElementById("loginList").innerText = "";
+    document.getElementById("loginList").innerText = "logout";
+    logOutEvent();
+    userId = "1";
+  }
+
+  const buttonFilterAll = document.getElementById("btnAll");
+  buttonFilterAll.addEventListener("click", function () {
+    loadAndGenerateProject(async () => {
+      const all = projects.filter(function (project) {
+        return project.category.id;
+      });
+      console.log(all);
+    });
+  });
+
+  const categories = await loadCategories();
+  generateButtons(categories, projects);
+}
+
+initialiserPage();
+
+async function loadCategories() {
+  const response = await fetch("http://localhost:5678/api/categories");
+  if (!response.ok) {
+    throw new Error("Erreur lors du chargement des catégories");
+  }
+  return response.json();
+}
 
 function isLoggedIn() {
   return localStorage.getItem("token") !== null;
-}
-
-async function chargerProjets() {
-  const reponse = await fetch(API_PREFIX + "works");
-  const projets = await reponse.json();
-  return projets;
 }
 
 function createBtnModify() {
@@ -52,7 +87,7 @@ function createHeaderEdition() {
 
 let modal;
 let overlay;
-let projets;
+let projects;
 let userId;
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -104,16 +139,14 @@ function openModal() {
 
   const miniatureContainer = document.createElement("container");
   miniatureContainer.id = "miniature-container";
-
   modal.appendChild(miniatureContainer);
 
   const miniatureGallery = document.createElement("div");
   miniatureGallery.id = "miniature-gallery";
-
   miniatureContainer.appendChild(miniatureGallery);
 
-  projets.forEach((projet) => {
-    const miniature = createMiniature(projet);
+  projects.forEach((project) => {
+    const miniature = createMiniature(project);
     miniatureGallery.appendChild(miniature);
   });
 
@@ -135,13 +168,14 @@ function openModal() {
   overlay.style.display = "block";
 }
 
-function createMiniature(projet) {
+function createMiniature(project) {
   const miniatureElement = document.createElement("div");
   miniatureElement.classList.add("miniature");
+  miniatureElement.dataset.id = project.id; // Ajouter l'ID du projet comme attribut data-id
 
   const miniatureImage = document.createElement("img");
-  miniatureImage.src = projet.imageUrl;
-  miniatureImage.alt = projet.title;
+  miniatureImage.src = project.imageUrl;
+  miniatureImage.alt = project.title;
 
   const deleteBtn = document.createElement("button");
   deleteBtn.className = "deleteBtn";
@@ -150,10 +184,8 @@ function createMiniature(projet) {
   deleteBtn.appendChild(iconeTrashCan);
 
   deleteBtn.addEventListener("click", (e) => {
-    const projectId = projet.id;
-
+    const projectId = project.id;
     deleteProject(projectId);
-    e.preventDefault();
   });
 
   miniatureElement.appendChild(miniatureImage);
@@ -162,20 +194,17 @@ function createMiniature(projet) {
   return miniatureElement;
 }
 
+function updateModalDisplay(deletedProjectId) {
+  const deletedMiniature = document.querySelector(`.miniature[data-id="${deletedProjectId}"]`);
+  if (deletedMiniature) {
+    deletedMiniature.remove();
+  }
+}
+
 function closeModal() {
   modal.style.display = "none";
 
   overlay.style.display = "none";
-}
-
-function updateModalDisplay() {
-  const miniatureGallery = document.getElementById("miniature-gallery");
-  miniatureGallery.innerHTML = "";
-
-  projets.forEach((projet) => {
-    const miniature = createMiniature(projet);
-    miniatureGallery.appendChild(miniature);
-  });
 }
 
 function addNewProject() {
@@ -387,7 +416,7 @@ function addNewProject() {
         .then((response) => response.json())
         .then((data) => {
           console.log("Response from the API:", data);
-          projets.push(data);
+          projects.push(data);
           updateProjectsDisplay();
           closeModal();
           btnModify.disabled = false;
@@ -405,7 +434,7 @@ function addNewProject() {
 function updateProjectsDisplay() {
   document.querySelector(".gallery").innerHTML = "";
 
-  genererProjet(projets);
+  generateProject(projects);
 }
 
 function deleteProject(id) {
@@ -421,9 +450,9 @@ function deleteProject(id) {
     .then((response) => {
       if (response.ok) {
         console.log("Projet supprimé avec succès");
-        projets = projets.filter((projet) => projet.id !== id);
+        projects = projects.filter((project) => project.id !== id);
         updateProjectsDisplay();
-        updateModalDisplay();
+        updateModalDisplay(id);
       } else if (response.status === 401) {
         console.error("Non autorisé");
       } else {
@@ -434,94 +463,3 @@ function deleteProject(id) {
       console.error("Erreur lors de la suppression du projet:", error);
     });
 }
-
-async function loadCategories() {
-  const response = await fetch('http://localhost:5678/api/categories');
-  if (!response.ok) {
-    throw new Error('Erreur lors du chargement des catégories');
-  }
-  return response.json();
-}
-
-async function initialiserPage() {
-  projets = await chargerProjets();
-  genererProjet(projets);
-
-  if (isLoggedIn()) {
-    document.getElementById("loginList").innerText = "";
-    document.getElementById("loginList").innerText = "logout";
-    logOutEvent();
-    userId = "1";
-  }
-
-  const boutonTrierTous = document.getElementById("btnTous");
-  boutonTrierTous.addEventListener("click", function () {
-    chargerEtGenererProjet(async () => {
-      const tous = projets.filter(function (projet) {
-        return projet.category.id;
-      });
-      console.log(tous);
-    });
-  });
-
-  const categories = await loadCategories();
-  generateBoutons(categories);
-}
-
-function generateBoutons(categories) {
-  const filtersContainer = document.getElementById("filters");
-
-  categories.forEach((categorie) => {
-    const bouton = document.createElement("button");
-    bouton.textContent = categorie.name;
-    bouton.classList.add("filter_button");
-    bouton.addEventListener("click", function () {
-      chargerEtGenererProjet( () => {
-        const projetsFiltres = projets.filter((projet) => {
-          return projet.category.id === categorie.id;
-        });
-        document.querySelector(".gallery").innerHTML = "";
-        genererProjet(projetsFiltres);
-        console.log(projetsFiltres);
-      });
-    });
-
-    filtersContainer.appendChild(bouton);
-  });
-}
-
-function chargerEtGenererProjet(callback) {
-  chargerProjets()
-    .then((projetsCharge) => {
-      document.querySelector(".gallery").innerHTML = "";
-      genererProjet(projetsCharge);
-      if (callback) {
-        callback(projetsCharge);
-      }
-    })
-    .catch((error) => {
-      console.error("Erreur lors du chargement des projets :", error);
-    });
-}
-
-function genererProjet(projets) {
-  for (let i = 0; i < projets.length; i++) {
-    const figure = projets[i];
-    const sectionGallery = document.querySelector(".gallery");
-    const projetElement = document.createElement("figure");
-    projetElement.dataset.id = projets[i].id;
-
-    const imageElement = document.createElement("img");
-
-    imageElement.src = figure.imageUrl;
-    const descriptionElement = document.createElement("figcaption");
-    descriptionElement.innerText = figure.title;
-
-    sectionGallery.appendChild(projetElement);
-    projetElement.appendChild(imageElement);
-    projetElement.appendChild(descriptionElement);
-  }
-}
-
-// Appel de la fonction pour initialiser la page
-initialiserPage();
