@@ -71,3 +71,17 @@ export function generateButtons(categories, projects) {
     filtersContainer.appendChild(button);
   });
 }
+
+export function createCustomElement(parentElement, elementType, elementId, className, textContent) {
+  const element = document.createElement(elementType);
+  if (elementId) {
+    element.id = elementId;
+  }
+  if (className) {
+    element.className = className;
+  }
+  if (textContent) {
+    element.textContent = textContent;
+  }
+  parentElement.appendChild(element);
+}

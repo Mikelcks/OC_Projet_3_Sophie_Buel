@@ -5,7 +5,13 @@ import {
   loadProjects,
   loadAndGenerateProject,
   generateButtons,
+  createCustomElement,
 } from "./functions.js";
+
+let modal;
+let overlay;
+let projects;
+let userId;
 
 async function initialiserPage() {
   projects = await loadProjects();
@@ -55,13 +61,17 @@ function createBtnModify() {
 
   button.className = "modif_button";
 
-  let icone = document.createElement("i");
-  icone.className = "fa-regular fa-pen-to-square";
-  button.appendChild(icone);
+  // let icone = document.createElement("i");
+  // icone.className = "fa-regular fa-pen-to-square";
+  // button.appendChild(icone);
 
-  let texteSpan = document.createElement("span");
-  texteSpan.innerHTML = " modifier";
-  button.appendChild(texteSpan);
+  // let texteSpan = document.createElement("span");
+  // texteSpan.innerHTML = " modifier";
+  // button.appendChild(texteSpan);
+
+  createCustomElement(button, "i", null, "fa-regular fa-pen-to-square", null);
+
+  createCustomElement(button, "span", null, null, " modifier");
 
   parentElement.appendChild(button);
 }
@@ -84,11 +94,6 @@ function createHeaderEdition() {
 
   body.insertBefore(headerEditionDiv, body.firstChild);
 }
-
-let modal;
-let overlay;
-let projects;
-let userId;
 
 document.addEventListener("DOMContentLoaded", function () {
   modal = document.createElement("div");
@@ -294,10 +299,12 @@ function addNewProject() {
             };
             reader.readAsDataURL(file);
           } else {
-            alert("La taille du fichier dépasse la limite de 4 Mo.");
+            errorMessage.innerHTML =
+              "La taille du fichier dépasse la limite de 4 Mo.";
           }
         } else {
-          alert("Veuillez sélectionner un fichier au format jpg, jpeg ou png.");
+          errorMessage.innerHTML =
+            "Veuillez sélectionner un fichier au format jpg, jpeg ou png.";
         }
       }
     });
@@ -426,7 +433,7 @@ function addNewProject() {
         });
     } else {
       errorMessage.innerHTML =
-        "Please fill in all the fields of the form (image, title & category)";
+        "Veuillez remplir tous les champs du formulaire (image, titre et catégorie)";
     }
   });
 }
