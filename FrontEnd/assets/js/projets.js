@@ -12,6 +12,8 @@ let modal;
 let overlay;
 let projects;
 let userId;
+let filteredCategoryId = null;
+let filteredProjects;
 
 async function initialiserPage() {
   projects = await loadProjects();
@@ -28,12 +30,18 @@ async function initialiserPage() {
   buttonFilterAll.addEventListener("click", function () {
     loadAndGenerateProject(async () => {
       const all = projects.filter(function (project) {
-        return project.category.id;
+        // Vérifier si le projet a une catégorie définie avant d'accéder à son ID
+        if (project.category && project.category.id) {
+          return true; // Si le projet a une catégorie définie, le conserver
+        } else {
+          return false; // Sinon, ignorer ce projet
+        }
       });
       console.log(all);
     });
+    filteredCategoryId = null;
   });
-
+  
   const categories = await loadCategories();
   generateButtons(categories, projects);
 }
@@ -360,6 +368,8 @@ function addNewProject() {
   separatorLine.id = "separator-line";
   addPhotoContainer.appendChild(separatorLine);
 
+  
+
   const btnSubmitProject = document.createElement("button");
   btnSubmitProject.id = "button-submit-project";
   btnSubmitProject.innerHTML = "Valider";
@@ -402,7 +412,7 @@ function addNewProject() {
     e.preventDefault();
 
     const title = inputTitleAddPhoto.value;
-    const categoryId = selectCategoryAddPhoto.value;
+    const categoryId = parseInt(selectCategoryAddPhoto.value);
     const accessToken = localStorage.getItem("token");
     const file = fileInput.files[0];
 
@@ -436,12 +446,34 @@ function addNewProject() {
         "Veuillez remplir tous les champs du formulaire (image, titre et catégorie)";
     }
   });
+  console.log(projects)
 }
 
-function updateProjectsDisplay() {
-  document.querySelector(".gallery").innerHTML = "";
+// function updateProjectsDisplay() {
+//   document.querySelector(".gallery").innerHTML = "";
 
-  generateProject(projects);
+//   generateProject(projects);
+// }
+
+async function updateProjectsDisplay() {
+  let filteredProjects = projects;
+
+  if (filteredCategoryId !== null) {
+    filteredProjects = filteredProjects.filter((project) => {
+      if (project.category && project.category.id) {
+        return project.category.id === filteredCategoryId;
+      } else if (project.categoryId) {
+        return parseInt(project.categoryId) === filteredCategoryId;
+      } else {
+        return false;
+      }
+    });
+  }
+
+  projects = filteredProjects;
+
+  document.querySelector(".gallery").innerHTML = "";
+  generateProject(filteredProjects);
 }
 
 function deleteProject(id) {
@@ -458,8 +490,14 @@ function deleteProject(id) {
       if (response.ok) {
         console.log("Projet supprimé avec succès");
         projects = projects.filter((project) => project.id !== id);
+
         updateProjectsDisplay();
         updateModalDisplay(id);
+
+        if (filteredCategoryId !== null) {
+          filteredProjects = filteredProjects.filter((project) => project.id !== id);
+          generateProject(filteredProjects);
+        }
       } else if (response.status === 401) {
         console.error("Non autorisé");
       } else {

@@ -50,7 +50,7 @@ export function loadAndGenerateProject(callback) {
     });
 }
 
-export function generateButtons(categories, projects) {
+export function generateButtons(categories) {
   const filtersContainer = document.getElementById("filters");
 
   categories.forEach((categorie) => {
@@ -58,9 +58,15 @@ export function generateButtons(categories, projects) {
     button.textContent = categorie.name;
     button.classList.add("filter_button");
     button.addEventListener("click", function () {
-      loadAndGenerateProject(() => {
-        const projectsFilters = projects.filter((project) => {
-          return project.category.id === categorie.id;
+      loadAndGenerateProject(async (updatedProjects) => {
+        const projectsFilters = updatedProjects.filter((project) => {
+          if (project.category && project.category.id) {
+            return project.category.id === categorie.id;
+          } else if (project.categoryId) {
+            return parseInt(project.categoryId) === categorie.id;
+          } else {
+            return false; // Si la catégorie n'est pas définie, ignorer ce projet
+          }
         });
         document.querySelector(".gallery").innerHTML = "";
         generateProject(projectsFilters);
